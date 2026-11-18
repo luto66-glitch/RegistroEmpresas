@@ -1419,31 +1419,34 @@
       btn.addEventListener("click", () => closeModal(btn.getAttribute("data-close-modal")));
     });
 
-    // Navegación secuencial completa con Enter en formulario principal
+    // Navegación secuencial completa con Enter (teclado físico y móvil/Enter keyCode 13)
+    const registerForm = document.getElementById("register-form");
     const inputCompany = document.getElementById("input-company");
     const inputRecipes = document.getElementById("input-recipes");
     const selectHasPsycho = document.getElementById("input-has-psycho");
     const inputPsychoCount = document.getElementById("input-psycho-count");
     const btnSubmit = document.getElementById("btn-submit");
 
-    inputCompany.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+    function isEnterKey(e) {
+      return e.key === "Enter" || e.code === "Enter" || e.code === "NumpadEnter" || e.keyCode === 13;
+    }
+
+    registerForm.addEventListener("keydown", (e) => {
+      if (!isEnterKey(e)) return;
+      const target = e.target;
+
+      if (target === inputCompany) {
         e.preventDefault();
+        e.stopPropagation();
         inputRecipes.focus();
         inputRecipes.select();
-      }
-    });
-
-    inputRecipes.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+      } else if (target === inputRecipes) {
         e.preventDefault();
+        e.stopPropagation();
         selectHasPsycho.focus();
-      }
-    });
-
-    selectHasPsycho.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+      } else if (target === selectHasPsycho) {
         e.preventDefault();
+        e.stopPropagation();
         if (selectHasPsycho.value === "si") {
           inputPsychoCount.disabled = false;
           if (Number(inputPsychoCount.value) === 0) inputPsychoCount.value = "1";
@@ -1452,15 +1455,12 @@
         } else {
           btnSubmit.focus();
         }
-      }
-    });
-
-    inputPsychoCount.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+      } else if (target === inputPsychoCount) {
         e.preventDefault();
+        e.stopPropagation();
         btnSubmit.focus();
       }
-    });
+    }, true);
 
     // Selector psicotrópicos en formulario principal
     selectHasPsycho.addEventListener("change", () => {
