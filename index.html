@@ -1354,8 +1354,7 @@
         ];
         return cols.join(";");
       });
-      return "﻿" + [headers.join(";"), ...rows].join("
-");
+      return "\uFEFF" + [headers.join(";"), ...rows].join("\r\n");
     }
 
     function downloadCsvFile() {
@@ -1617,7 +1616,7 @@
     document.getElementById("btn-preview-csv").addEventListener("click", openCsvPreviewModal);
     document.getElementById("btn-download-csv-modal").addEventListener("click", downloadCsvFile);
     document.getElementById("btn-copy-csv").addEventListener("click", () => {
-      const csv = buildCsvContent(state.records).replace(/^﻿/, "");
+      const csv = buildCsvContent(state.records).replace(/^\uFEFF/, "");
       navigator.clipboard?.writeText(csv);
       showToast("Datos CSV copiados al portapapeles");
     });
