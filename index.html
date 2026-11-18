@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro Diario de Empresas y Recetas</title>
+  <meta name="theme-color" content="#1e3a8a" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
+      --primary-soft: #dbeafe;
+      --success: #047857;
+      --success-soft: #d1fae5;
+      --warning: #b45309;
+      --warning-soft: #fef3c7;
+      --danger: #b91c1c;
+      --danger-soft: #fee2e2;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 3rem;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 1.1rem 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #38bdf8;
+      border: 1px solid rgba(147, 197, 253, 0.35);
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand p {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.38rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fbbf24;
+    }
+
+    .status-dot.cloud {
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.55rem 0.95rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--surface-alt);
+    }
+
+    .btn-ghost-light {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-ghost-light:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #ffffff;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background: #065f46;
+    }
+
+    .btn-danger-outline {
+      background: transparent;
+      color: var(--danger);
+      border-color: #fecaca;
+      padding: 0.35rem 0.55rem;
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger-soft);
+    }
+
+    .btn-edit-outline {
+      background: transparent;
+      color: var(--primary);
+      border-color: #bfdbfe;
+      padding: 0.35rem 0.55rem;
+    }
+
+    .btn-edit-outline:hover {
+      background: var(--primary-soft);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 1.4rem auto 0;
+      padding: 0 1.25rem;
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.3rem;
+    }
+
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .day-badge {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr 1.1fr 1fr auto;
+      gap: 0.85rem;
+      align-items: end;
+    }
+
+    @media (max-width: 960px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-grid .span-full {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 0.62rem 0.78rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: #ffffff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.14);
+    }
+
+    .field input:disabled {
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .last-code-banner {
+      margin-top: 1rem;
+      padding: 0.85rem 1.1rem;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%);
+      border: 1px solid #bfdbfe;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .last-code-banner.hidden {
+      display: none;
+    }
+
+    .code-pill-lg {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: #ffffff;
+      border: 2px solid #93c5fd;
+      padding: 0.2rem 0.85rem;
+      border-radius: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 0.15rem;
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .toolbar input[type="date"],
+    .toolbar input[type="search"] {
+      padding: 0.48rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 0.88rem;
+      background: #ffffff;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-light);
+      border-radius: 11px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    thead {
+      background: var(--surface-alt);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 0.75rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.75rem 0.85rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .code-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 0.25rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid #bfdbfe;
+    }
+
+    .code-badge:hover {
+      background: #bfdbfe;
+    }
+
+    .pill-yes {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .pill-no {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: var(--text-muted);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state.hidden {
+      display: none;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 60;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      padding: 1.35rem;
+    }
+
+    .modal.modal-lg {
+      max-width: 920px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      margin-top: 1.2rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .days-config-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.45rem;
+      margin-top: 0.35rem;
+    }
+
+    .days-config-grid input {
+      text-align: center;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.45rem 0.2rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.75rem 1.1rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.22s ease;
+      z-index: 80;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon" id="header-sample-code">1M</div>
+        <div>
+          <h1>Registro Diario de Empresas y Recetas</h1>
+          <p id="header-clock">Cargando fecha y hora...</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="status-pill" id="sync-status-pill">
+          <span class="status-dot" id="sync-status-dot"></span>
+          <span id="sync-status-text">Sincronización Local Activa</span>
+        </div>
+        <button type="button" class="btn btn-ghost-light hidden" id="btn-install-pwa">Instalar App</button>
+        <button type="button" class="btn btn-ghost-light" id="btn-open-settings" title="Configuración">Configuración</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Formulario de Registro -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">Nuevo Registro Consecutivo</h2>
+        <span class="day-badge" id="today-rule-badge">Hoy: Miércoles (Letra M) · Próximo: 1M</span>
+      </div>
+
+      <form id="register-form" autocomplete="off">
+        <div class="form-grid">
+          <div class="field span-full">
+            <label for="input-company">Nombre de la Empresa *</label>
+            <input type="text" id="input-company" placeholder="Ej. Farmacia Santa María (Enter para ir a recetas)" required autofocus />
+          </div>
+
+          <div class="field">
+            <label for="input-recipes">Cantidad de Recetas *</label>
+            <input type="number" id="input-recipes" min="0" step="1" value="1" required />
+          </div>
+
+          <div class="field">
+            <label for="input-has-psycho">¿Hay Psicotrópicos?</label>
+            <select id="input-has-psycho">
+              <option value="no" selected>No</option>
+              <option value="si">Sí</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="input-psycho-count">Cant. Psicotrópicos</label>
+            <input type="number" id="input-psycho-count" min="0" step="1" value="0" disabled />
+          </div>
+
+          <div class="field span-full">
+            <button type="submit" class="btn btn-primary" id="btn-submit" style="height: 42px; width: 100%;">
+              Generar Código y Guardar
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="last-code-banner hidden" id="last-code-banner">
+        <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+          <span class="code-pill-lg" id="banner-code">1M</span>
+          <div>
+            <div style="font-weight: 700; font-size: 0.98rem;" id="banner-company">Empresa Registrada</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);" id="banner-meta">Detalles</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btn-copy-last">Copiar Código</button>
+      </div>
+    </section>
+
+    <!-- Tarjetas de Resumen Diario -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Empresas Registradas</div>
+          <div class="stat-value" id="stat-companies">0</div>
+        </div>
+        <div class="stat-icon" style="background: var(--primary-soft); color: var(--primary);">EMP</div>
+      </div>
+
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Total de Recetas</div>
+          <div class="stat-value" id="stat-recipes">0</div>
+        </div>
+        <div class="stat-icon" style="background: var(--success-soft); color: var(--success);">REC</div>
+      </div>
+
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Recetas Psicotrópicos</div>
+          <div class="stat-value" id="stat-psycho">0</div>
+        </div>
+        <div class="stat-icon" style="background: var(--warning-soft); color: var(--warning);">PSI</div>
+      </div>
+    </section>
+
+    <!-- Listado Diario -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Listado de Registros <span class="day-badge" id="list-count-badge">0</span></h2>
+          <p style="font-size: 0.82rem; color: var(--text-muted);" id="selected-date-subtitle">Mostrando registros del día</p>
+        </div>
+        <div class="toolbar-group">
+          <button type="button" class="btn btn-secondary" id="btn-preview-csv">Ver CSV</button>
+          <button type="button" class="btn btn-success" id="btn-export-csv">Exportar CSV</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <label for="filter-date" style="font-size: 0.84rem; font-weight: 600; color: var(--text-muted);">Fecha:</label>
+          <input type="date" id="filter-date" />
+          <button type="button" class="btn btn-secondary hidden" id="btn-go-today">Volver a Hoy</button>
+        </div>
+        <div class="toolbar-group" style="flex: 1; max-width: 340px;">
+          <input type="search" id="filter-search" placeholder="Buscar por código, empresa o puesto..." style="width: 100%;" />
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Empresa</th>
+              <th>Recetas</th>
+              <th>Psicotrópicos</th>
+              <th>Cant. Psicot.</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Equipo / Puesto</th>
+              <th style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="records-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="empty-state hidden" id="empty-state">
+        <h3 id="empty-state-title" style="font-size: 1rem; margin-bottom: 0.25rem;">Aún no hay registros hoy</h3>
+        <p id="empty-state-desc" style="font-size: 0.86rem;">Digita el nombre de una empresa arriba para generar el primer código (1) del día.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Editar Registro -->
+  <div class="modal-backdrop" id="modal-edit">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-size: 1.05rem; font-weight: 700;">Editar Registro</h3>
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-edit">Cerrar</button>
+      </div>
+      <form id="edit-form">
+        <input type="hidden" id="edit-id" />
+        <div style="background: var(--surface-alt); border: 1px solid var(--border-light); border-radius: 10px; padding: 0.75rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-size: 0.78rem; color: var(--text-muted); display: block;">Código Asignado (Inmutable)</span>
+            <strong id="edit-code-display" style="font-size: 1.2rem; color: var(--primary);">1M</strong>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 0.78rem; color: var(--text-muted); display: block;">Fecha y Hora Original</span>
+            <span id="edit-datetime-display" style="font-size: 0.85rem; font-weight: 600;">--</span>
+          </div>
+        </div>
+
+        <div style="display: grid; gap: 0.85rem;">
+          <div class="field">
+            <label for="edit-company">Nombre de la Empresa *</label>
+            <input type="text" id="edit-company" required />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+            <div class="field">
+              <label for="edit-recipes">Recetas *</label>
+              <input type="number" id="edit-recipes" min="0" step="1" required />
+            </div>
+            <div class="field">
+              <label for="edit-has-psycho">¿Psicotrópicos?</label>
+              <select id="edit-has-psycho">
+                <option value="no">No</option>
+                <option value="si">Sí</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="edit-psycho-count">Cant. Psicot.</label>
+              <input type="number" id="edit-psycho-count" min="0" step="1" disabled />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-edit">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Vista Previa CSV (Solo Tabla Estructurada) -->
+  <div class="modal-backdrop" id="modal-csv">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 700;">Vista Previa del Listado CSV</h3>
+          <p id="csv-modal-subtitle" style="font-size: 0.82rem; color: var(--text-muted);">Registros del día seleccionado</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-csv">Cerrar</button>
+      </div>
+
+      <div class="table-wrap" style="max-height: 58vh; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Empresa</th>
+              <th>Cantidad de Recetas</th>
+              <th>¿Psicotrópicos?</th>
+              <th>Cantidad Psicotrópicos</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Equipo/Puesto</th>
+            </tr>
+          </thead>
+          <tbody id="csv-preview-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-copy-csv">Copiar CSV</button>
+        <button type="button" class="btn btn-success" id="btn-download-csv-modal">Descargar archivo .csv</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Configuración -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-size: 1.05rem; font-weight: 700;">Configuración del Puesto y Nube</h3>
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-settings">Cerrar</button>
+      </div>
+
+      <form id="settings-form" style="display: grid; gap: 1rem;">
+        <div class="field">
+          <label for="cfg-operator">Nombre del Equipo / Ventanilla</label>
+          <input type="text" id="cfg-operator" placeholder="Ej. Ventanilla 1 / Recepción" required />
+        </div>
+
+        <div class="field">
+          <label>Letras por Día de la Semana (Lun - Dom)</label>
+          <div class="days-config-grid">
+            <div><small style="display:block;text-align:center;color:var(--text-muted);">Lun</small><input type="text" maxlength="2" id="cfg-day-1" required /></div>
+            <div><small style="display:block;text-align:center;color:var(--text-muted);">Mar</small><input type="text" maxlength="2" id="cfg-day-2" required /></div>
+            <div><small style="display:block;text-align:center;color:var(--text-muted);">Mié</small><input type="text" maxlength="2" id="cfg-day-3" required /></div>
+            <div><small style="display:block;text-align:center;color:var(--text-muted);">Jue</small><input type="text" maxlength="2" id="cfg-day-4" required /></div>
+            <div><small style="display:block;text-align:center;color:var(--text-muted);">Vie</small><input type="text" maxlength="2" id="cfg-day-5" required /></div>
+            <div><small style="display:block;text-align:center;color:var(--text-muted);">Sáb</small><input type="text" maxlength="2" id="cfg-day-6" required /></div>
+            <div><small style="display:block;text-align:center;color:var(--text-muted);">Dom</small><input type="text" maxlength="2" id="cfg-day-0" required /></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="cfg-firebase">Configuración Firebase JSON (Opcional - Nube Multi-Equipo)</label>
+          <textarea id="cfg-firebase" rows="5" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "..."}'></textarea>
+          <small style="color: var(--text-muted); font-size: 0.78rem;">Si se deja vacío, funciona en modo local. Al pegar el JSON de tu proyecto Firebase, todos los equipos compartirán los consecutivos en tiempo real.</small>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-reset-days">Restaurar L-K-M-J-V-S-D</button>
+          <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Eliminación -->
+  <div class="modal-backdrop" id="modal-delete">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--danger);">Eliminar Registro</h3>
+      </div>
+      <p style="font-size: 0.92rem; color: var(--text-muted);">
+        ¿Confirmas que deseas eliminar el registro <strong id="delete-code-label" style="color: var(--text);"></strong> de <strong id="delete-company-label" style="color: var(--text);"></strong>?
+      </p>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-delete">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-delete" style="background: var(--danger);">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      runTransaction,
+      onSnapshot,
+      query,
+      where,
+      updateDoc,
+      deleteDoc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    const DEFAULT_DAY_LETTERS = {
+      1: "L", // Lunes
+      2: "K", // Martes
+      3: "M", // Miércoles
+      4: "J", // Jueves
+      5: "V", // Viernes
+      6: "S", // Sábado
+      0: "D"  // Domingo
+    };
+
+    const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const STORAGE_KEYS = {
+      OPERATOR: "pwa_reg_operator_v1",
+      DAY_LETTERS: "pwa_reg_day_letters_v1",
+      FIREBASE_CFG: "pwa_reg_firebase_cfg_v1",
+      LOCAL_RECORDS: "pwa_reg_local_records_v1",
+      LOCAL_COUNTERS: "pwa_reg_local_counters_v1"
+    };
+
+    let state = {
+      operator: localStorage.getItem(STORAGE_KEYS.OPERATOR) || "Ventanilla 1",
+      dayLetters: loadDayLetters(),
+      firebaseConfigRaw: localStorage.getItem(STORAGE_KEYS.FIREBASE_CFG) || "",
+      db: null,
+      cloudEnabled: false,
+      unsubscribeSnapshot: null,
+      selectedDateKey: getLocalDateKey(new Date()),
+      currentTodayKey: getLocalDateKey(new Date()),
+      records: [],
+      pendingDeleteId: null,
+      deferredPrompt: null
+    };
+
+    const channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("registro_recetas_sync") : null;
+    if (channel) {
+      channel.onmessage = () => {
+        if (!state.cloudEnabled) {
+          loadLocalRecordsForDate(state.selectedDateKey);
+        }
+      };
+    }
+
+    function loadDayLetters() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.DAY_LETTERS));
+        if (saved && typeof saved === "object") {
+          return { ...DEFAULT_DAY_LETTERS, ...saved };
+        }
+      } catch (_) {}
+      return { ...DEFAULT_DAY_LETTERS };
+    }
+
+    function getLocalDateKey(dateObj = new Date()) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const d = String(dateObj.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function getLocalTimeString(dateObj = new Date()) {
+      const hh = String(dateObj.getHours()).padStart(2, "0");
+      const mm = String(dateObj.getMinutes()).padStart(2, "0");
+      const ss = String(dateObj.getSeconds()).padStart(2, "0");
+      return `${hh}:${mm}:${ss}`;
+    }
+
+    function getDayLetterForDateKey(dateKey) {
+      const [y, m, d] = dateKey.split("-").map(Number);
+      const dt = new Date(y, m - 1, d);
+      const dow = dt.getDay();
+      return (state.dayLetters[dow] || DEFAULT_DAY_LETTERS[dow] || "X").toUpperCase();
+    }
+
+    function formatDateReadable(dateKey) {
+      const [y, m, d] = dateKey.split("-").map(Number);
+      const dt = new Date(y, m - 1, d);
+      return `${DAY_NAMES[dt.getDay()]} ${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}/${y}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove("show"), 2800);
+    }
+
+    // Reloj en vivo y verificación de cambio de día
+    function updateClockAndBadges() {
+      const now = new Date();
+      const todayKey = getLocalDateKey(now);
+      if (todayKey !== state.currentTodayKey) {
+        const wasOnToday = state.selectedDateKey === state.currentTodayKey;
+        state.currentTodayKey = todayKey;
+        if (wasOnToday) {
+          state.selectedDateKey = todayKey;
+          document.getElementById("filter-date").value = todayKey;
+          subscribeToDate(todayKey);
+        }
+      }
+
+      document.getElementById("header-clock").textContent =
+        `${formatDateReadable(todayKey)} · ${getLocalTimeString(now)} · Puesto: ${state.operator}`;
+
+      const letter = getDayLetterForDateKey(todayKey);
+      const nextNum = getNextExpectedNumberForToday();
+      const sampleCode = `${nextNum}${letter}`;
+      document.getElementById("header-sample-code").textContent = sampleCode;
+      document.getElementById("today-rule-badge").textContent =
+        `Hoy: ${DAY_NAMES[now.getDay()]} (Letra ${letter}) · Próximo: ${sampleCode}`;
+    }
+
+    function getNextExpectedNumberForToday() {
+      if (state.selectedDateKey === state.currentTodayKey && state.records.length > 0) {
+        const maxSeq = state.records.reduce((max, r) => Math.max(max, Number(r.sequence) || 0), 0);
+        return maxSeq + 1;
+      }
+      if (!state.cloudEnabled) {
+        try {
+          const counters = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_COUNTERS) || "{}");
+          return (Number(counters[state.currentTodayKey]) || 0) + 1;
+        } catch (_) {}
+      }
+      return 1;
+    }
+
+    // Inicialización Firebase o Local
+    async function initStorageEngine() {
+      const pillDot = document.getElementById("sync-status-dot");
+      const pillText = document.getElementById("sync-status-text");
+
+      if (state.unsubscribeSnapshot) {
+        state.unsubscribeSnapshot();
+        state.unsubscribeSnapshot = null;
+      }
+
+      const raw = state.firebaseConfigRaw.trim();
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (!parsed.projectId || !parsed.apiKey) {
+            throw new Error("Falta projectId o apiKey");
+          }
+          for (const existingApp of getApps()) {
+            await deleteApp(existingApp);
+          }
+          const app = initializeApp(parsed);
+          state.db = getFirestore(app);
+          state.cloudEnabled = true;
+          pillDot.classList.add("cloud");
+          pillText.textContent = `Nube Conectada (${parsed.projectId})`;
+          subscribeToDate(state.selectedDateKey);
+          return;
+        } catch (err) {
+          console.warn("Firebase inválido, usando respaldo local:", err);
+          showToast("Configuración Firebase inválida; usando modo local.");
+        }
+      }
+
+      state.db = null;
+      state.cloudEnabled = false;
+      pillDot.classList.remove("cloud");
+      pillText.textContent = "Sincronización Local Activa";
+      subscribeToDate(state.selectedDateKey);
+    }
+
+    function subscribeToDate(dateKey) {
+      state.selectedDateKey = dateKey;
+      if (state.unsubscribeSnapshot) {
+        state.unsubscribeSnapshot();
+        state.unsubscribeSnapshot = null;
+      }
+
+      if (state.cloudEnabled && state.db) {
+        const q = query(collection(state.db, "records"), where("dateKey", "==", dateKey));
+        state.unsubscribeSnapshot = onSnapshot(
+          q,
+          (snapshot) => {
+            const list = [];
+            snapshot.forEach((docSnap) => {
+              list.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            list.sort((a, b) => (Number(a.sequence) || 0) - (Number(b.sequence) || 0));
+            state.records = list;
+            renderAll();
+          },
+          (error) => {
+            console.error("Error Firestore onSnapshot:", error);
+            showToast("Sin conexión a nube; cambiando a respaldo local.");
+            state.cloudEnabled = false;
+            document.getElementById("sync-status-dot").classList.remove("cloud");
+            document.getElementById("sync-status-text").textContent = "Respaldo Local Activo";
+            loadLocalRecordsForDate(dateKey);
+          }
+        );
+      } else {
+        loadLocalRecordsForDate(dateKey);
+      }
+    }
+
+    function getAllLocalRecords() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_RECORDS) || "[]");
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveAllLocalRecords(all) {
+      localStorage.setItem(STORAGE_KEYS.LOCAL_RECORDS, JSON.stringify(all));
+      if (channel) channel.postMessage({ type: "update" });
+    }
+
+    function loadLocalRecordsForDate(dateKey) {
+      const all = getAllLocalRecords();
+      state.records = all
+        .filter((r) => r.dateKey === dateKey)
+        .sort((a, b) => (Number(a.sequence) || 0) - (Number(b.sequence) || 0));
+      renderAll();
+    }
+
+    // Crear registro atómico
+    async function createNewRecord({ companyName, recipesCount, hasPsychotropics, psychotropicsCount }) {
+      const now = new Date();
+      const dateKey = getLocalDateKey(now);
+      const timeStr = getLocalTimeString(now);
+      const dayLetter = getDayLetterForDateKey(dateKey);
+
+      if (state.cloudEnabled && state.db) {
+        try {
+          const counterRef = doc(state.db, "counters", dateKey);
+          const newRecordRef = doc(collection(state.db, "records"));
+
+          const created = await runTransaction(state.db, async (tx) => {
+            const counterSnap = await tx.get(counterRef);
+            const currentVal = counterSnap.exists() ? Number(counterSnap.data().lastSequence) || 0 : 0;
+            const nextSeq = currentVal + 1;
+            const code = `${nextSeq}${dayLetter}`;
+
+            const payload = {
+              sequence: nextSeq,
+              dayLetter,
+              code,
+              companyName,
+              recipesCount,
+              hasPsychotropics,
+              psychotropicsCount: hasPsychotropics ? psychotropicsCount : 0,
+              dateKey,
+              time: timeStr,
+              operator: state.operator,
+              createdAtMs: now.getTime()
+            };
+
+            tx.set(counterRef, { lastSequence: nextSeq, updatedAtMs: now.getTime() }, { merge: true });
+            tx.set(newRecordRef, payload);
+            return { id: newRecordRef.id, ...payload };
+          });
+
+          return created;
+        } catch (err) {
+          console.error("Fallo transacción nube, guardando en local:", err);
+          showToast("Error en nube; guardado en modo local.");
+        }
+      }
+
+      // Modo local atómico
+      const counters = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_COUNTERS) || "{}");
+      const all = getAllLocalRecords();
+      const maxInRecords = all
+        .filter((r) => r.dateKey === dateKey)
+        .reduce((m, r) => Math.max(m, Number(r.sequence) || 0), 0);
+      const nextSeq = Math.max(Number(counters[dateKey]) || 0, maxInRecords) + 1;
+      counters[dateKey] = nextSeq;
+      localStorage.setItem(STORAGE_KEYS.LOCAL_COUNTERS, JSON.stringify(counters));
+
+      const code = `${nextSeq}${dayLetter}`;
+      const record = {
+        id: `loc_${now.getTime()}_${Math.random().toString(36).slice(2, 7)}`,
+        sequence: nextSeq,
+        dayLetter,
+        code,
+        companyName,
+        recipesCount,
+        hasPsychotropics,
+        psychotropicsCount: hasPsychotropics ? psychotropicsCount : 0,
+        dateKey,
+        time: timeStr,
+        operator: state.operator,
+        createdAtMs: now.getTime()
+      };
+
+      all.push(record);
+      saveAllLocalRecords(all);
+      if (state.selectedDateKey === dateKey) {
+        loadLocalRecordsForDate(dateKey);
+      }
+      return record;
+    }
+
+    async function updateExistingRecord(id, updates) {
+      if (state.cloudEnabled && state.db && !id.startsWith("loc_")) {
+        await updateDoc(doc(state.db, "records", id), updates);
+        return;
+      }
+      const all = getAllLocalRecords();
+      const idx = all.findIndex((r) => r.id === id);
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], ...updates };
+        saveAllLocalRecords(all);
+        loadLocalRecordsForDate(state.selectedDateKey);
+      }
+    }
+
+    async function removeRecord(id) {
+      if (state.cloudEnabled && state.db && !id.startsWith("loc_")) {
+        await deleteDoc(doc(state.db, "records", id));
+        return;
+      }
+      const all = getAllLocalRecords().filter((r) => r.id !== id);
+      saveAllLocalRecords(all);
+      loadLocalRecordsForDate(state.selectedDateKey);
+    }
+
+    // Renderizado
+    function renderAll() {
+      updateClockAndBadges();
+      renderStats();
+      renderRecordsTable();
+    }
+
+    function renderStats() {
+      const totalCompanies = state.records.length;
+      const totalRecipes = state.records.reduce((sum, r) => sum + (Number(r.recipesCount) || 0), 0);
+      const totalPsycho = state.records.reduce(
+        (sum, r) => sum + (r.hasPsychotropics ? Number(r.psychotropicsCount) || 0 : 0),
+        0
+      );
+
+      document.getElementById("stat-companies").textContent = totalCompanies;
+      document.getElementById("stat-recipes").textContent = totalRecipes;
+      document.getElementById("stat-psycho").textContent = totalPsycho;
+    }
+
+    function renderRecordsTable() {
+      const tbody = document.getElementById("records-tbody");
+      const emptyState = document.getElementById("empty-state");
+      const searchQuery = document.getElementById("filter-search").value.trim().toLowerCase();
+
+      const filtered = state.records.filter((item) => {
+        if (!searchQuery) return true;
+        const psychoText = item.hasPsychotropics ? "si sí psicotropicos" : "no";
+        return (
+          (item.companyName && item.companyName.toLowerCase().includes(searchQuery)) ||
+          (item.code && item.code.toLowerCase().includes(searchQuery)) ||
+          (item.operator && item.operator.toLowerCase().includes(searchQuery)) ||
+          psychoText.includes(searchQuery)
+        );
+      });
+
+      document.getElementById("list-count-badge").textContent = filtered.length;
+      const isToday = state.selectedDateKey === state.currentTodayKey;
+      document.getElementById("selected-date-subtitle").textContent = isToday
+        ? `Mostrando registros de hoy (${formatDateReadable(state.selectedDateKey)})`
+        : `Historial del ${formatDateReadable(state.selectedDateKey)}`;
+
+      const btnToday = document.getElementById("btn-go-today");
+      if (isToday) btnToday.classList.add("hidden");
+      else btnToday.classList.remove("hidden");
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        if (searchQuery) {
+          document.getElementById("empty-state-title").textContent = "Sin coincidencias";
+          document.getElementById("empty-state-desc").textContent = `No hay registros que coincidan con "${searchQuery}".`;
+        } else {
+          document.getElementById("empty-state-title").textContent = isToday
+            ? "Aún no hay registros hoy"
+            : "Sin registros en esta fecha";
+          document.getElementById("empty-state-desc").textContent = isToday
+            ? "Digita el nombre de una empresa arriba para generar el primer código (1) del día."
+            : "No se guardaron códigos de empresas en la fecha seleccionada.";
+        }
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      tbody.innerHTML = filtered
+        .map((rec) => {
+          const safeId = escapeHtml(rec.id);
+          const safeCode = escapeHtml(rec.code);
+          const safeCompany = escapeHtml(rec.companyName);
+          const safeOperator = escapeHtml(rec.operator || "Sistema");
+          const safeDate = escapeHtml(rec.dateKey || state.selectedDateKey);
+          const safeTime = escapeHtml(rec.time || "--:--:--");
+          const recipesCount = Number(rec.recipesCount) || 0;
+          const hasPsycho = Boolean(rec.hasPsychotropics);
+          const psychoCount = hasPsycho ? Number(rec.psychotropicsCount) || 0 : 0;
+
+          return `
+            <tr>
+              <td>
+                <button type="button" class="code-badge" data-copy-code="${safeCode}" title="Clic para copiar código">
+                  ${safeCode}
+                </button>
+              </td>
+              <td style="font-weight: 600;">${safeCompany}</td>
+              <td>${recipesCount}</td>
+              <td>${hasPsycho ? '<span class="pill-yes">Sí</span>' : '<span class="pill-no">No</span>'}</td>
+              <td>${psychoCount}</td>
+              <td>${safeDate}</td>
+              <td style="font-variant-numeric: tabular-nums;">${safeTime}</td>
+              <td style="color: var(--text-muted); font-size: 0.84rem;">${safeOperator}</td>
+              <td style="text-align: right; white-space: nowrap;">
+                <button type="button" class="btn btn-edit-outline" data-edit-id="${safeId}" title="Editar datos">Editar</button>
+                <button type="button" class="btn btn-danger-outline" data-delete-id="${safeId}" title="Eliminar registro">Eliminar</button>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    // CSV Helpers
+    function buildCsvContent(records) {
+      const headers = [
+        "Codigo",
+        "Empresa",
+        "Cantidad de Recetas",
+        "Psicotropicos",
+        "Cantidad Psicotropicos",
+        "Fecha",
+        "Hora",
+        "Equipo/Puesto"
+      ];
+      const rows = records.map((r) => {
+        const hasPsycho = Boolean(r.hasPsychotropics);
+        const cols = [
+          r.code || "",
+          `"${String(r.companyName || "").replace(/"/g, '""')}"`,
+          Number(r.recipesCount) || 0,
+          hasPsycho ? "Sí" : "No",
+          hasPsycho ? Number(r.psychotropicsCount) || 0 : 0,
+          r.dateKey || state.selectedDateKey,
+          r.time || "",
+          `"${String(r.operator || "").replace(/"/g, '""')}"`
+        ];
+        return cols.join(";");
+      });
+      return "﻿" + [headers.join(";"), ...rows].join("
+");
+    }
+
+    function downloadCsvFile() {
+      if (state.records.length === 0) {
+        showToast("No hay registros para exportar en esta fecha.");
+        return;
+      }
+      const csv = buildCsvContent(state.records);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `registro_empresas_${state.selectedDateKey}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`CSV descargado (${state.records.length} registros).`);
+    }
+
+    function openCsvPreviewModal() {
+      if (state.records.length === 0) {
+        showToast("No hay registros para visualizar en esta fecha.");
+        return;
+      }
+      document.getElementById("csv-modal-subtitle").textContent =
+        `${formatDateReadable(state.selectedDateKey)} · ${state.records.length} registros`;
+
+      const tbody = document.getElementById("csv-preview-tbody");
+      tbody.innerHTML = state.records
+        .map((r) => {
+          const hasPsycho = Boolean(r.hasPsychotropics);
+          return `
+            <tr>
+              <td style="font-weight: 700; color: var(--primary);">${escapeHtml(r.code)}</td>
+              <td>${escapeHtml(r.companyName)}</td>
+              <td>${Number(r.recipesCount) || 0}</td>
+              <td>${hasPsycho ? "Sí" : "No"}</td>
+              <td>${hasPsycho ? Number(r.psychotropicsCount) || 0 : 0}</td>
+              <td>${escapeHtml(r.dateKey)}</td>
+              <td>${escapeHtml(r.time)}</td>
+              <td>${escapeHtml(r.operator || "")}</td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      openModal("modal-csv");
+    }
+
+    // Modals
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    // Eventos UI
+    document.querySelectorAll("[data-close-modal]").forEach((btn) => {
+      btn.addEventListener("click", () => closeModal(btn.getAttribute("data-close-modal")));
+    });
+
+    // Enter en Nombre de la Empresa -> salta a Cantidad de Recetas
+    const inputCompany = document.getElementById("input-company");
+    const inputRecipes = document.getElementById("input-recipes");
+    inputCompany.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        inputRecipes.focus();
+        inputRecipes.select();
+      }
+    });
+
+    // Selector psicotrópicos en formulario principal
+    const selectHasPsycho = document.getElementById("input-has-psycho");
+    const inputPsychoCount = document.getElementById("input-psycho-count");
+    selectHasPsycho.addEventListener("change", () => {
+      if (selectHasPsycho.value === "si") {
+        inputPsychoCount.disabled = false;
+        if (Number(inputPsychoCount.value) === 0) inputPsychoCount.value = "1";
+        inputPsychoCount.focus();
+        inputPsychoCount.select();
+      } else {
+        inputPsychoCount.value = "0";
+        inputPsychoCount.disabled = true;
+      }
+    });
+
+    // Envío de nuevo registro
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const companyName = inputCompany.value.trim();
+      if (!companyName) {
+        inputCompany.focus();
+        return;
+      }
+      const recipesCount = Math.max(0, parseInt(inputRecipes.value, 10) || 0);
+      const hasPsychotropics = selectHasPsycho.value === "si";
+      const psychotropicsCount = hasPsychotropics ? Math.max(0, parseInt(inputPsychoCount.value, 10) || 0) : 0;
+
+      const btnSubmit = document.getElementById("btn-submit");
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = "Guardando...";
+
+      try {
+        const created = await createNewRecord({
+          companyName,
+          recipesCount,
+          hasPsychotropics,
+          psychotropicsCount
+        });
+
+        // Actualizar banner superior
+        const banner = document.getElementById("last-code-banner");
+        banner.classList.remove("hidden");
+        document.getElementById("banner-code").textContent = created.code;
+        document.getElementById("banner-company").textContent = created.companyName;
+        document.getElementById("banner-meta").textContent =
+          `Recetas: ${created.recipesCount} · Psicotrópicos: ${
+            created.hasPsychotropics ? `Sí (${created.psychotropicsCount})` : "No"
+          } · Hora: ${created.time}`;
+
+        // Resetear campos
+        inputCompany.value = "";
+        inputRecipes.value = "1";
+        selectHasPsycho.value = "no";
+        inputPsychoCount.value = "0";
+        inputPsychoCount.disabled = true;
+        inputCompany.focus();
+
+        showToast(`Código ${created.code} asignado a ${created.companyName}`);
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Generar Código y Guardar";
+      }
+    });
+
+    document.getElementById("btn-copy-last").addEventListener("click", () => {
+      const code = document.getElementById("banner-code").textContent;
+      navigator.clipboard?.writeText(code);
+      showToast(`Código ${code} copiado al portapapeles`);
+    });
+
+    // Delegación de eventos en tabla (copiar, editar, eliminar)
+    document.getElementById("records-tbody").addEventListener("click", (e) => {
+      const copyBtn = e.target.closest("[data-copy-code]");
+      if (copyBtn) {
+        const code = copyBtn.getAttribute("data-copy-code");
+        navigator.clipboard?.writeText(code);
+        showToast(`Código ${code} copiado`);
+        return;
+      }
+
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        const id = editBtn.getAttribute("data-edit-id");
+        const rec = state.records.find((r) => r.id === id);
+        if (!rec) return;
+        document.getElementById("edit-id").value = rec.id;
+        document.getElementById("edit-code-display").textContent = rec.code;
+        document.getElementById("edit-datetime-display").textContent = `${rec.dateKey} · ${rec.time}`;
+        document.getElementById("edit-company").value = rec.companyName;
+        document.getElementById("edit-recipes").value = Number(rec.recipesCount) || 0;
+        const hasPsycho = Boolean(rec.hasPsychotropics);
+        document.getElementById("edit-has-psycho").value = hasPsycho ? "si" : "no";
+        const editPsychoInput = document.getElementById("edit-psycho-count");
+        editPsychoInput.disabled = !hasPsycho;
+        editPsychoInput.value = hasPsycho ? Number(rec.psychotropicsCount) || 0 : 0;
+        openModal("modal-edit");
+        return;
+      }
+
+      const delBtn = e.target.closest("[data-delete-id]");
+      if (delBtn) {
+        const id = delBtn.getAttribute("data-delete-id");
+        const rec = state.records.find((r) => r.id === id);
+        if (!rec) return;
+        state.pendingDeleteId = id;
+        document.getElementById("delete-code-label").textContent = rec.code;
+        document.getElementById("delete-company-label").textContent = rec.companyName;
+        openModal("modal-delete");
+      }
+    });
+
+    // Modal Editar controles
+    const editCompany = document.getElementById("edit-company");
+    const editRecipes = document.getElementById("edit-recipes");
+    editCompany.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        editRecipes.focus();
+        editRecipes.select();
+      }
+    });
+
+    const editHasPsycho = document.getElementById("edit-has-psycho");
+    const editPsychoCount = document.getElementById("edit-psycho-count");
+    editHasPsycho.addEventListener("change", () => {
+      if (editHasPsycho.value === "si") {
+        editPsychoCount.disabled = false;
+        if (Number(editPsychoCount.value) === 0) editPsychoCount.value = "1";
+        editPsychoCount.focus();
+        editPsychoCount.select();
+      } else {
+        editPsychoCount.value = "0";
+        editPsychoCount.disabled = true;
+      }
+    });
+
+    document.getElementById("edit-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("edit-id").value;
+      const companyName = editCompany.value.trim();
+      if (!companyName) return;
+      const recipesCount = Math.max(0, parseInt(editRecipes.value, 10) || 0);
+      const hasPsychotropics = editHasPsycho.value === "si";
+      const psychotropicsCount = hasPsychotropics ? Math.max(0, parseInt(editPsychoCount.value, 10) || 0) : 0;
+
+      await updateExistingRecord(id, {
+        companyName,
+        recipesCount,
+        hasPsychotropics,
+        psychotropicsCount
+      });
+
+      closeModal("modal-edit");
+      showToast("Registro actualizado correctamente");
+    });
+
+    // Confirmar eliminación
+    document.getElementById("btn-confirm-delete").addEventListener("click", async () => {
+      if (!state.pendingDeleteId) return;
+      await removeRecord(state.pendingDeleteId);
+      state.pendingDeleteId = null;
+      closeModal("modal-delete");
+      showToast("Registro eliminado");
+    });
+
+    // Filtros fecha y búsqueda
+    const filterDate = document.getElementById("filter-date");
+    filterDate.value = state.selectedDateKey;
+    filterDate.addEventListener("change", () => {
+      if (filterDate.value) {
+        subscribeToDate(filterDate.value);
+      }
+    });
+
+    document.getElementById("btn-go-today").addEventListener("click", () => {
+      filterDate.value = state.currentTodayKey;
+      subscribeToDate(state.currentTodayKey);
+    });
+
+    document.getElementById("filter-search").addEventListener("input", renderRecordsTable);
+
+    // CSV botones
+    document.getElementById("btn-export-csv").addEventListener("click", downloadCsvFile);
+    document.getElementById("btn-preview-csv").addEventListener("click", openCsvPreviewModal);
+    document.getElementById("btn-download-csv-modal").addEventListener("click", downloadCsvFile);
+    document.getElementById("btn-copy-csv").addEventListener("click", () => {
+      const csv = buildCsvContent(state.records).replace(/^﻿/, "");
+      navigator.clipboard?.writeText(csv);
+      showToast("Datos CSV copiados al portapapeles");
+    });
+
+    // Configuración modal
+    document.getElementById("btn-open-settings").addEventListener("click", () => {
+      document.getElementById("cfg-operator").value = state.operator;
+      [1, 2, 3, 4, 5, 6, 0].forEach((dow) => {
+        document.getElementById(`cfg-day-${dow}`).value = state.dayLetters[dow] || DEFAULT_DAY_LETTERS[dow];
+      });
+      document.getElementById("cfg-firebase").value = state.firebaseConfigRaw;
+      openModal("modal-settings");
+    });
+
+    document.getElementById("btn-reset-days").addEventListener("click", () => {
+      [1, 2, 3, 4, 5, 6, 0].forEach((dow) => {
+        document.getElementById(`cfg-day-${dow}`).value = DEFAULT_DAY_LETTERS[dow];
+      });
+    });
+
+    document.getElementById("settings-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      state.operator = document.getElementById("cfg-operator").value.trim() || "Ventanilla 1";
+      localStorage.setItem(STORAGE_KEYS.OPERATOR, state.operator);
+
+      const newLetters = {};
+      [1, 2, 3, 4, 5, 6, 0].forEach((dow) => {
+        const val = document.getElementById(`cfg-day-${dow}`).value.trim().toUpperCase();
+        newLetters[dow] = val || DEFAULT_DAY_LETTERS[dow];
+      });
+      state.dayLetters = newLetters;
+      localStorage.setItem(STORAGE_KEYS.DAY_LETTERS, JSON.stringify(newLetters));
+
+      state.firebaseConfigRaw = document.getElementById("cfg-firebase").value.trim();
+      localStorage.setItem(STORAGE_KEYS.FIREBASE_CFG, state.firebaseConfigRaw);
+
+      closeModal("modal-settings");
+      await initStorageEngine();
+      updateClockAndBadges();
+      showToast("Configuración guardada");
+    });
+
+    // Registro Service Worker e instalación PWA
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      state.deferredPrompt = e;
+      const btnInstall = document.getElementById("btn-install-pwa");
+      btnInstall.classList.remove("hidden");
+      btnInstall.onclick = async () => {
+        if (!state.deferredPrompt) return;
+        state.deferredPrompt.prompt();
+        await state.deferredPrompt.userChoice;
+        state.deferredPrompt = null;
+        btnInstall.classList.add("hidden");
+      };
+    });
+
+    // Arranque
+    setInterval(updateClockAndBadges, 1000);
+    initStorageEngine();
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Registro Diario de Empresas y Recetas",
+  "short_name": "Registro Recetas",
+  "description": "Control diario de códigos consecutivos por empresa, cantidad de recetas y psicotrópicos.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e3a8a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
