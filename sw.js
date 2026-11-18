@@ -1,9 +1,11 @@
-const CACHE_NAME = 'registro-recetas-pwa-v1';
+const CACHE_NAME = 'registro-recetas-pwa-v2';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png'
 ];
 
 self.addEventListener('install', (event) => {

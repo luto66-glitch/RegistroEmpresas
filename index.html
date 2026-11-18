@@ -6,8 +6,8 @@
   <title>Registro Diario de Empresas y Recetas</title>
   <meta name="theme-color" content="#1e3a8a" />
   <link rel="manifest" href="./manifest.json" />
-  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
-  <link rel="apple-touch-icon" href="./icon.svg" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png" />
   <style>
     :root {
       --bg: #f1f5f9;
@@ -616,7 +616,7 @@
         <div class="form-grid">
           <div class="field span-full">
             <label for="input-company">Nombre de la Empresa *</label>
-            <input type="text" id="input-company" placeholder="Ej. Farmacia Santa María (Enter para ir a recetas)" required autofocus />
+            <input type="text" id="input-company" placeholder="Ej. Farmacia Santa María (Enter para avanzar entre campos)" required autofocus />
           </div>
 
           <div class="field">
@@ -1419,9 +1419,13 @@
       btn.addEventListener("click", () => closeModal(btn.getAttribute("data-close-modal")));
     });
 
-    // Enter en Nombre de la Empresa -> salta a Cantidad de Recetas
+    // Navegación secuencial completa con Enter en formulario principal
     const inputCompany = document.getElementById("input-company");
     const inputRecipes = document.getElementById("input-recipes");
+    const selectHasPsycho = document.getElementById("input-has-psycho");
+    const inputPsychoCount = document.getElementById("input-psycho-count");
+    const btnSubmit = document.getElementById("btn-submit");
+
     inputCompany.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -1430,9 +1434,35 @@
       }
     });
 
+    inputRecipes.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        selectHasPsycho.focus();
+      }
+    });
+
+    selectHasPsycho.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (selectHasPsycho.value === "si") {
+          inputPsychoCount.disabled = false;
+          if (Number(inputPsychoCount.value) === 0) inputPsychoCount.value = "1";
+          inputPsychoCount.focus();
+          inputPsychoCount.select();
+        } else {
+          btnSubmit.focus();
+        }
+      }
+    });
+
+    inputPsychoCount.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        btnSubmit.focus();
+      }
+    });
+
     // Selector psicotrópicos en formulario principal
-    const selectHasPsycho = document.getElementById("input-has-psycho");
-    const inputPsychoCount = document.getElementById("input-psycho-count");
     selectHasPsycho.addEventListener("change", () => {
       if (selectHasPsycho.value === "si") {
         inputPsychoCount.disabled = false;
@@ -1457,7 +1487,6 @@
       const hasPsychotropics = selectHasPsycho.value === "si";
       const psychotropicsCount = hasPsychotropics ? Math.max(0, parseInt(inputPsychoCount.value, 10) || 0) : 0;
 
-      const btnSubmit = document.getElementById("btn-submit");
       btnSubmit.disabled = true;
       btnSubmit.textContent = "Guardando...";
 
@@ -1541,9 +1570,13 @@
       }
     });
 
-    // Modal Editar controles
+    // Modal Editar controles con navegación secuencial Enter
     const editCompany = document.getElementById("edit-company");
     const editRecipes = document.getElementById("edit-recipes");
+    const editHasPsycho = document.getElementById("edit-has-psycho");
+    const editPsychoCount = document.getElementById("edit-psycho-count");
+    const btnEditSubmit = document.querySelector('#edit-form button[type="submit"]');
+
     editCompany.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -1552,8 +1585,34 @@
       }
     });
 
-    const editHasPsycho = document.getElementById("edit-has-psycho");
-    const editPsychoCount = document.getElementById("edit-psycho-count");
+    editRecipes.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        editHasPsycho.focus();
+      }
+    });
+
+    editHasPsycho.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (editHasPsycho.value === "si") {
+          editPsychoCount.disabled = false;
+          if (Number(editPsychoCount.value) === 0) editPsychoCount.value = "1";
+          editPsychoCount.focus();
+          editPsychoCount.select();
+        } else if (btnEditSubmit) {
+          btnEditSubmit.focus();
+        }
+      }
+    });
+
+    editPsychoCount.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (btnEditSubmit) btnEditSubmit.focus();
+      }
+    });
+
     editHasPsycho.addEventListener("change", () => {
       if (editHasPsycho.value === "si") {
         editPsychoCount.disabled = false;
