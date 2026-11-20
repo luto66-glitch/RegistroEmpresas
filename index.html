@@ -234,6 +234,16 @@
       background: linear-gradient(180deg, #047857 0%, #065f46 100%);
     }
 
+    .btn-warning {
+      background: var(--amber-light);
+      color: var(--amber);
+      border-color: var(--amber-border);
+    }
+
+    .btn-warning:hover:not(:disabled) {
+      background: #fef3c7;
+    }
+
     .btn-icon-sm {
       padding: 0.38rem 0.6rem;
       font-size: 0.78rem;
@@ -311,7 +321,26 @@
       border-radius: 999px;
     }
 
-    /* Barra de Usuario */
+    .parity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.3rem 0.72rem;
+      border-radius: 999px;
+      background: var(--surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
+    }
+
+    .parity-badge.active-offline {
+      background: var(--amber-light);
+      color: var(--amber);
+      border-color: var(--amber-border);
+    }
+
+    /* Barra de Usuario y Modo Offline */
     .user-bar {
       display: flex;
       flex-wrap: wrap;
@@ -351,31 +380,52 @@
       white-space: nowrap;
     }
 
-    .user-bar input {
-      width: 100%;
-      max-width: 300px;
+    .user-bar input,
+    .user-bar select {
       padding: 0.42rem 0.75rem;
       border: 1px solid var(--border-strong);
       border-radius: var(--radius-sm);
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
       color: var(--text-main);
       background: #ffffff;
       transition: all 0.15s;
     }
 
-    .user-bar input:focus {
+    .user-bar input {
+      width: 100%;
+      max-width: 260px;
+    }
+
+    .user-bar input:focus,
+    .user-bar select:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
     }
 
-    .user-hint {
-      font-size: 0.76rem;
-      color: var(--text-muted);
+    .offline-control-group {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Banner alerta offline */
+    .offline-alert {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: var(--amber-light);
+      border: 1px solid var(--amber-border);
+      color: #92400e;
+      padding: 0.72rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.83rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
     }
 
     /* Formulario de Registro */
@@ -669,6 +719,19 @@
       opacity: 0.75;
     }
 
+    .local-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.12rem 0.42rem;
+      border-radius: 5px;
+      background: var(--amber-light);
+      color: var(--amber);
+      border: 1px solid var(--amber-border);
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+
     .pill-yes {
       display: inline-flex;
       align-items: center;
@@ -830,6 +893,10 @@
           <span class="status-dot" id="sync-status-dot"></span>
           <span id="sync-status-text">Conectando a la nube...</span>
         </div>
+        <button type="button" class="btn btn-warning hidden" id="btn-sync-pending" title="Subir registros creados sin conexión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span id="sync-pending-label">Sincronizar (0)</span>
+        </button>
         <button type="button" class="btn btn-ghost-light hidden" id="btn-install-pwa">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Instalar App
@@ -850,10 +917,20 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           Nuevo Registro Consecutivo
         </h2>
-        <span class="day-badge" id="today-rule-badge">Hoy: Miércoles (Letra M) · Próximo: 1M</span>
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="day-badge" id="today-rule-badge">Hoy: Miércoles (Letra M) · Próximo: 1M</span>
+        </div>
       </div>
 
-      <!-- Barra de Usuario -->
+      <!-- Aviso cuando no hay conexión -->
+      <div class="offline-alert hidden" id="offline-mode-banner">
+        <div style="display: flex; align-items: center; gap: 0.55rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+          <span id="offline-mode-banner-text">Sin conexión a la red: este equipo está generando códigos en modo local.</span>
+        </div>
+      </div>
+
+      <!-- Barra de Usuario y Paridad Offline -->
       <div class="user-bar">
         <div class="user-bar-group">
           <div class="user-avatar">
@@ -862,10 +939,8 @@
           <label for="main-user-input">Usuario / Ventanilla:</label>
           <input type="text" id="main-user-input" placeholder="Nombre del usuario o ventanilla" />
         </div>
-        <span class="user-hint">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Se guarda automáticamente en cada código generado
-        </span>
+
+
       </div>
 
       <form id="register-form" autocomplete="off">
@@ -1004,7 +1079,7 @@
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </div>
         <h3 id="empty-state-title" style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Aún no hay registros hoy</h3>
-        <p id="empty-state-desc" style="font-size: 0.85rem; max-width: 420px; margin: 0 auto;">Digita el nombre de una empresa arriba para generar el primer código (1) del día.</p>
+        <p id="empty-state-desc" style="font-size: 0.85rem; max-width: 420px; margin: 0 auto;">Digita el nombre de una empresa arriba para generar el primer código del día.</p>
       </div>
     </section>
   </main>
@@ -1105,7 +1180,7 @@
   <div class="modal-backdrop" id="modal-settings">
     <div class="modal">
       <div class="modal-header">
-        <h3 style="font-size: 1.05rem; font-weight: 700;">Configuración de Letras y Nube</h3>
+        <h3 style="font-size: 1.05rem; font-weight: 700;">Configuración del Equipo y Nube</h3>
         <button type="button" class="btn btn-secondary btn-icon-sm" data-close-modal="modal-settings">Cerrar</button>
       </div>
 
@@ -1113,6 +1188,18 @@
         <div class="field">
           <label for="cfg-operator">Usuario predeterminado</label>
           <input type="text" id="cfg-operator" placeholder="Ej. Ventanilla 1 / Recepción" required />
+        </div>
+
+        <div class="field">
+          <label for="cfg-offline-parity">Numeración sin conexión en este equipo</label>
+          <select id="cfg-offline-parity">
+            <option value="auto">Automático (consecutivo normal sin restricción)</option>
+            <option value="even">Solo números PARES sin red (2, 4, 6...)</option>
+            <option value="odd">Solo números IMPARES sin red (1, 3, 5...)</option>
+          </select>
+          <small style="color: var(--text-muted); font-size: 0.76rem;">
+            Evita códigos repetidos cuando varios equipos trabajan sin internet: configura un equipo en Pares y otro en Impares. Con conexión usan el contador normal.
+          </small>
         </div>
 
         <div class="field">
@@ -1190,7 +1277,8 @@
       DAY_LETTERS: "pwa_reg_day_letters_v1",
       FIREBASE_CFG: "pwa_reg_firebase_cfg_v1",
       LOCAL_RECORDS: "pwa_reg_local_records_v1",
-      LOCAL_COUNTERS: "pwa_reg_local_counters_v1"
+      LOCAL_COUNTERS: "pwa_reg_local_counters_v1",
+      OFFLINE_PARITY: "pwa_reg_offline_parity_v1"
     };
 
     const DEFAULT_FIREBASE_CONFIG = JSON.stringify({
@@ -1205,6 +1293,7 @@
 
     let state = {
       operator: localStorage.getItem(STORAGE_KEYS.OPERATOR) || "Ventanilla 1",
+      offlineParity: loadOfflineParity(),
       dayLetters: loadDayLetters(),
       firebaseConfigRaw: localStorage.getItem(STORAGE_KEYS.FIREBASE_CFG) || DEFAULT_FIREBASE_CONFIG,
       db: null,
@@ -1212,18 +1301,49 @@
       unsubscribeSnapshot: null,
       selectedDateKey: getLocalDateKey(new Date()),
       currentTodayKey: getLocalDateKey(new Date()),
+      cloudRecords: [],
       records: [],
       pendingDeleteId: null,
-      deferredPrompt: null
+      deferredPrompt: null,
+      isSyncingPending: false
     };
 
     const channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("registro_recetas_sync") : null;
     if (channel) {
       channel.onmessage = () => {
-        if (!state.cloudEnabled) {
-          loadLocalRecordsForDate(state.selectedDateKey);
-        }
+        refreshMergedRecords();
       };
+    }
+
+    function loadOfflineParity() {
+      const saved = localStorage.getItem(STORAGE_KEYS.OFFLINE_PARITY);
+      return saved === "even" || saved === "odd" ? saved : "auto";
+    }
+
+    function setOfflineParity(mode) {
+      const clean = mode === "even" || mode === "odd" ? mode : "auto";
+      state.offlineParity = clean;
+      localStorage.setItem(STORAGE_KEYS.OFFLINE_PARITY, clean);
+      const mainSel = document.getElementById("main-offline-parity");
+      if (mainSel) mainSel.value = clean;
+      updateClockAndBadges();
+    }
+
+    function isOfflineActive() {
+      return !navigator.onLine || !state.cloudEnabled || !state.db;
+    }
+
+    function computeNextSequence(lastKnownSeq, parityMode) {
+      const current = Math.max(0, Number(lastKnownSeq) || 0);
+      if (parityMode === "even") {
+        // 0->2, 1->2, 2->4, 3->4, 4->6...
+        return current % 2 === 0 ? current + 2 : current + 1;
+      }
+      if (parityMode === "odd") {
+        // 0->1, 1->3, 2->3, 3->5, 4->5...
+        return current % 2 === 1 ? current + 2 : current + 1;
+      }
+      return current + 1;
     }
 
     function loadDayLetters() {
@@ -1277,11 +1397,13 @@
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(el._timer);
-      el._timer = setTimeout(() => el.classList.remove("show"), 2800);
+      el._timer = setTimeout(() => el.classList.remove("show"), 3000);
     }
 
     const mainUserInput = document.getElementById("main-user-input");
     mainUserInput.value = state.operator;
+
+
 
     function setCurrentUser(newName, persist = true) {
       const clean = newName.trim() || "Ventanilla 1";
@@ -1312,6 +1434,61 @@
       }
     });
 
+    function getAllLocalRecords() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_RECORDS) || "[]");
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveAllLocalRecords(all) {
+      localStorage.setItem(STORAGE_KEYS.LOCAL_RECORDS, JSON.stringify(all));
+      if (channel) channel.postMessage({ type: "update" });
+      updatePendingSyncButton();
+    }
+
+    function updatePendingSyncButton() {
+      const pending = getAllLocalRecords();
+      const btn = document.getElementById("btn-sync-pending");
+      const label = document.getElementById("sync-pending-label");
+      if (pending.length > 0 && navigator.onLine && state.cloudEnabled && state.db) {
+        btn.classList.remove("hidden");
+        label.textContent = `Sincronizar (${pending.length})`;
+      } else {
+        btn.classList.add("hidden");
+      }
+    }
+
+    function updateConnectionUI() {
+      const pillDot = document.getElementById("sync-status-dot");
+      const pillText = document.getElementById("sync-status-text");
+      const offlineBanner = document.getElementById("offline-mode-banner");
+      const offlineBannerText = document.getElementById("offline-mode-banner-text");
+
+      const online = navigator.onLine;
+      if (online && state.cloudEnabled && state.db) {
+        pillDot.classList.add("cloud");
+        pillText.textContent = "En Red · Nube Conectada";
+        offlineBanner.classList.add("hidden");
+      } else {
+        pillDot.classList.remove("cloud");
+        pillText.textContent = online ? "En Red · Modo Local" : "Sin Red (Modo Offline)";
+        offlineBanner.classList.remove("hidden");
+
+        const modeDesc =
+          state.offlineParity === "even"
+            ? "generando SOLO NÚMEROS PARES (2, 4, 6...) para evitar duplicados."
+            : state.offlineParity === "odd"
+              ? "generando SOLO NÚMEROS IMPARES (1, 3, 5...) para evitar duplicados."
+              : "generando números consecutivos locales (configura Pares o Impares si usas varios equipos).";
+
+        offlineBannerText.textContent = `Sin conexión a la red: este equipo está ${modeDesc}`;
+      }
+
+      updatePendingSyncButton();
+    }
+
     function updateClockAndBadges() {
       const now = new Date();
       const todayKey = getLocalDateKey(now);
@@ -1325,6 +1502,8 @@
         }
       }
 
+      updateConnectionUI();
+
       document.getElementById("header-clock").textContent =
         `${formatDateReadable(todayKey)} · ${getLocalTimeString(now)} · Usuario: ${state.operator}`;
 
@@ -1334,26 +1513,92 @@
       document.getElementById("header-sample-code").textContent = sampleCode;
       document.getElementById("today-rule-badge").textContent =
         `Hoy: ${DAY_NAMES[now.getDay()]} (Letra ${letter}) · Próximo: ${sampleCode}`;
+
+
     }
 
     function getNextExpectedNumberForToday() {
+      let maxKnown = 0;
+
       if (state.selectedDateKey === state.currentTodayKey && state.records.length > 0) {
-        const maxSeq = state.records.reduce((max, r) => Math.max(max, Number(r.sequence) || 0), 0);
-        return maxSeq + 1;
-      }
-      if (!state.cloudEnabled) {
+        maxKnown = state.records.reduce((max, r) => Math.max(max, Number(r.sequence) || 0), 0);
+      } else {
+        const allLocal = getAllLocalRecords().filter((r) => r.dateKey === state.currentTodayKey);
+        const maxLocal = allLocal.reduce((max, r) => Math.max(max, Number(r.sequence) || 0), 0);
         try {
           const counters = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_COUNTERS) || "{}");
-          return (Number(counters[state.currentTodayKey]) || 0) + 1;
-        } catch (_) {}
+          maxKnown = Math.max(Number(counters[state.currentTodayKey]) || 0, maxLocal);
+        } catch (_) {
+          maxKnown = maxLocal;
+        }
       }
-      return 1;
+
+      if (isOfflineActive() && state.offlineParity !== "auto") {
+        return computeNextSequence(maxKnown, state.offlineParity);
+      }
+
+      return maxKnown + 1;
+    }
+
+    function refreshMergedRecords() {
+      const localForDate = getAllLocalRecords().filter((r) => r.dateKey === state.selectedDateKey);
+      const combined = [...state.cloudRecords, ...localForDate];
+      combined.sort((a, b) => (Number(a.sequence) || 0) - (Number(b.sequence) || 0));
+      state.records = combined;
+      renderAll();
+    }
+
+    async function syncPendingLocalRecords() {
+      if (state.isSyncingPending) return;
+      if (!navigator.onLine || !state.cloudEnabled || !state.db) return;
+
+      const pending = getAllLocalRecords();
+      if (pending.length === 0) return;
+
+      state.isSyncingPending = true;
+      try {
+        const byDate = {};
+        for (const rec of pending) {
+          if (!byDate[rec.dateKey]) byDate[rec.dateKey] = [];
+          byDate[rec.dateKey].push(rec);
+        }
+
+        const syncedIds = new Set();
+
+        for (const [dateKey, items] of Object.entries(byDate)) {
+          const counterRef = doc(state.db, "counters", dateKey);
+          const maxOfflineSeq = items.reduce((m, r) => Math.max(m, Number(r.sequence) || 0), 0);
+
+          await runTransaction(state.db, async (tx) => {
+            const snap = await tx.get(counterRef);
+            const cloudSeq = snap.exists() ? Number(snap.data().lastSequence) || 0 : 0;
+            const newMaxSeq = Math.max(cloudSeq, maxOfflineSeq);
+
+            tx.set(counterRef, { lastSequence: newMaxSeq, updatedAtMs: Date.now() }, { merge: true });
+
+            for (const item of items) {
+              const newDocRef = doc(collection(state.db, "records"));
+              const { id, isLocalPending, ...cleanData } = item;
+              tx.set(newDocRef, cleanData);
+            }
+          });
+
+          items.forEach((it) => syncedIds.add(it.id));
+        }
+
+        const remaining = getAllLocalRecords().filter((r) => !syncedIds.has(r.id));
+        saveAllLocalRecords(remaining);
+        refreshMergedRecords();
+        showToast(`Se sincronizaron ${syncedIds.size} registro(s) con la nube.`);
+      } catch (err) {
+        console.error("Error al sincronizar pendientes:", err);
+      } finally {
+        state.isSyncingPending = false;
+        updatePendingSyncButton();
+      }
     }
 
     async function initStorageEngine() {
-      const pillDot = document.getElementById("sync-status-dot");
-      const pillText = document.getElementById("sync-status-text");
-
       if (state.unsubscribeSnapshot) {
         state.unsubscribeSnapshot();
         state.unsubscribeSnapshot = null;
@@ -1372,9 +1617,11 @@
           const app = initializeApp(parsed);
           state.db = getFirestore(app);
           state.cloudEnabled = true;
-          pillDot.classList.add("cloud");
-          pillText.textContent = `Nube Conectada (${parsed.projectId})`;
+          updateConnectionUI();
           subscribeToDate(state.selectedDateKey);
+          if (navigator.onLine) {
+            syncPendingLocalRecords();
+          }
           return;
         } catch (err) {
           console.warn("Firebase inválido, usando respaldo local:", err);
@@ -1384,8 +1631,8 @@
 
       state.db = null;
       state.cloudEnabled = false;
-      pillDot.classList.remove("cloud");
-      pillText.textContent = "Sincronización Local Activa";
+      state.cloudRecords = [];
+      updateConnectionUI();
       subscribeToDate(state.selectedDateKey);
     }
 
@@ -1405,43 +1652,30 @@
             snapshot.forEach((docSnap) => {
               list.push({ id: docSnap.id, ...docSnap.data() });
             });
-            list.sort((a, b) => (Number(a.sequence) || 0) - (Number(b.sequence) || 0));
-            state.records = list;
-            renderAll();
+            state.cloudRecords = list;
+
+            // Actualizar respaldo de último contador conocido para hoy
+            if (dateKey === state.currentTodayKey && list.length > 0) {
+              const maxCloud = list.reduce((m, r) => Math.max(m, Number(r.sequence) || 0), 0);
+              const counters = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_COUNTERS) || "{}");
+              if (maxCloud > (Number(counters[dateKey]) || 0)) {
+                counters[dateKey] = maxCloud;
+                localStorage.setItem(STORAGE_KEYS.LOCAL_COUNTERS, JSON.stringify(counters));
+              }
+            }
+
+            refreshMergedRecords();
           },
           (error) => {
             console.error("Error Firestore onSnapshot:", error);
-            showToast("Sin conexión a nube; cambiando a respaldo local.");
-            state.cloudEnabled = false;
-            document.getElementById("sync-status-dot").classList.remove("cloud");
-            document.getElementById("sync-status-text").textContent = "Respaldo Local Activo";
-            loadLocalRecordsForDate(dateKey);
+            updateConnectionUI();
+            refreshMergedRecords();
           }
         );
       } else {
-        loadLocalRecordsForDate(dateKey);
+        state.cloudRecords = [];
+        refreshMergedRecords();
       }
-    }
-
-    function getAllLocalRecords() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_RECORDS) || "[]");
-      } catch (_) {
-        return [];
-      }
-    }
-
-    function saveAllLocalRecords(all) {
-      localStorage.setItem(STORAGE_KEYS.LOCAL_RECORDS, JSON.stringify(all));
-      if (channel) channel.postMessage({ type: "update" });
-    }
-
-    function loadLocalRecordsForDate(dateKey) {
-      const all = getAllLocalRecords();
-      state.records = all
-        .filter((r) => r.dateKey === dateKey)
-        .sort((a, b) => (Number(a.sequence) || 0) - (Number(b.sequence) || 0));
-      renderAll();
     }
 
     async function createNewRecord({ companyName, recipesCount, hasPsychotropics, psychotropicsCount }) {
@@ -1451,7 +1685,8 @@
       const dayLetter = getDayLetterForDateKey(dateKey);
       const activeUser = mainUserInput.value.trim() || state.operator || "Ventanilla 1";
 
-      if (state.cloudEnabled && state.db) {
+      // Si hay conexión activa a internet y Firebase, usa transacción global normal
+      if (navigator.onLine && state.cloudEnabled && state.db) {
         try {
           const counterRef = doc(state.db, "counters", dateKey);
           const newRecordRef = doc(collection(state.db, "records"));
@@ -1459,7 +1694,11 @@
           const created = await runTransaction(state.db, async (tx) => {
             const counterSnap = await tx.get(counterRef);
             const currentVal = counterSnap.exists() ? Number(counterSnap.data().lastSequence) || 0 : 0;
-            const nextSeq = currentVal + 1;
+
+            const allLocalForDate = getAllLocalRecords().filter((r) => r.dateKey === dateKey);
+            const maxLocalVal = allLocalForDate.reduce((m, r) => Math.max(m, Number(r.sequence) || 0), 0);
+
+            const nextSeq = Math.max(currentVal, maxLocalVal) + 1;
             const code = `${nextSeq}${dayLetter}`;
 
             const payload = {
@@ -1481,25 +1720,37 @@
             return { id: newRecordRef.id, ...payload };
           });
 
+          const counters = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_COUNTERS) || "{}");
+          counters[dateKey] = Math.max(Number(counters[dateKey]) || 0, created.sequence);
+          localStorage.setItem(STORAGE_KEYS.LOCAL_COUNTERS, JSON.stringify(counters));
+
           return created;
         } catch (err) {
-          console.error("Fallo transacción nube, guardando en local:", err);
-          showToast("Error en nube; guardado en modo local.");
+          console.error("Fallo transacción nube, guardando en modo sin red:", err);
+          showToast("Sin respuesta de la nube; aplicando numeración sin red.");
         }
       }
 
+      // Modo sin conexión a la red: aplica Pares, Impares o Automático según configuración del equipo
       const counters = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCAL_COUNTERS) || "{}");
       const all = getAllLocalRecords();
-      const maxInRecords = all
+      const maxInLocalRecords = all
         .filter((r) => r.dateKey === dateKey)
         .reduce((m, r) => Math.max(m, Number(r.sequence) || 0), 0);
-      const nextSeq = Math.max(Number(counters[dateKey]) || 0, maxInRecords) + 1;
+      const maxInCloudCache = state.cloudRecords
+        .filter((r) => r.dateKey === dateKey)
+        .reduce((m, r) => Math.max(m, Number(r.sequence) || 0), 0);
+
+      const currentMax = Math.max(Number(counters[dateKey]) || 0, maxInLocalRecords, maxInCloudCache);
+      const nextSeq = computeNextSequence(currentMax, state.offlineParity);
+
       counters[dateKey] = nextSeq;
       localStorage.setItem(STORAGE_KEYS.LOCAL_COUNTERS, JSON.stringify(counters));
 
       const code = `${nextSeq}${dayLetter}`;
       const record = {
         id: `loc_${now.getTime()}_${Math.random().toString(36).slice(2, 7)}`,
+        isLocalPending: true,
         sequence: nextSeq,
         dayLetter,
         code,
@@ -1515,14 +1766,12 @@
 
       all.push(record);
       saveAllLocalRecords(all);
-      if (state.selectedDateKey === dateKey) {
-        loadLocalRecordsForDate(dateKey);
-      }
+      refreshMergedRecords();
       return record;
     }
 
     async function updateExistingRecord(id, updates) {
-      if (state.cloudEnabled && state.db && !id.startsWith("loc_")) {
+      if (navigator.onLine && state.cloudEnabled && state.db && !id.startsWith("loc_")) {
         await updateDoc(doc(state.db, "records", id), updates);
         return;
       }
@@ -1531,18 +1780,18 @@
       if (idx !== -1) {
         all[idx] = { ...all[idx], ...updates };
         saveAllLocalRecords(all);
-        loadLocalRecordsForDate(state.selectedDateKey);
+        refreshMergedRecords();
       }
     }
 
     async function removeRecord(id) {
-      if (state.cloudEnabled && state.db && !id.startsWith("loc_")) {
+      if (navigator.onLine && state.cloudEnabled && state.db && !id.startsWith("loc_")) {
         await deleteDoc(doc(state.db, "records", id));
         return;
       }
       const all = getAllLocalRecords().filter((r) => r.id !== id);
       saveAllLocalRecords(all);
-      loadLocalRecordsForDate(state.selectedDateKey);
+      refreshMergedRecords();
     }
 
     function renderAll() {
@@ -1601,7 +1850,7 @@
             ? "Aún no hay registros hoy"
             : "Sin registros en esta fecha";
           document.getElementById("empty-state-desc").textContent = isToday
-            ? "Digita el nombre de una empresa arriba para generar el primer código (1) del día."
+            ? "Digita el nombre de una empresa arriba para generar el primer código del día."
             : "No se guardaron códigos de empresas en la fecha seleccionada.";
         }
         return;
@@ -1619,6 +1868,7 @@
           const recipesCount = Number(rec.recipesCount) || 0;
           const hasPsycho = Boolean(rec.hasPsychotropics);
           const psychoCount = hasPsycho ? Number(rec.psychotropicsCount) || 0 : 0;
+          const isPending = String(rec.id || "").startsWith("loc_");
 
           return `
             <tr>
@@ -1627,6 +1877,7 @@
                   ${safeCode}
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
+                ${isPending ? '<span class="local-tag" title="Guardado localmente pendiente de subir a la nube">Local</span>' : ''}
               </td>
               <td style="font-weight: 600;">${safeCompany}</td>
               <td style="font-variant-numeric: tabular-nums; font-weight: 600;">${recipesCount}</td>
@@ -1990,6 +2241,7 @@
 
     document.getElementById("btn-open-settings").addEventListener("click", () => {
       document.getElementById("cfg-operator").value = state.operator;
+      document.getElementById("cfg-offline-parity").value = state.offlineParity;
       [1, 2, 3, 4, 5, 6, 0].forEach((dow) => {
         document.getElementById(`cfg-day-${dow}`).value = state.dayLetters[dow] || DEFAULT_DAY_LETTERS[dow];
       });
@@ -2009,6 +2261,9 @@
       mainUserInput.value = newOp;
       setCurrentUser(newOp);
 
+      const selectedParity = document.getElementById("cfg-offline-parity").value;
+      setOfflineParity(selectedParity);
+
       const newLetters = {};
       [1, 2, 3, 4, 5, 6, 0].forEach((dow) => {
         const val = document.getElementById(`cfg-day-${dow}`).value.trim().toUpperCase();
@@ -2026,6 +2281,10 @@
       showToast("Configuración guardada");
     });
 
+    document.getElementById("btn-sync-pending").addEventListener("click", () => {
+      syncPendingLocalRecords();
+    });
+
     document.getElementById("btn-export-csv").addEventListener("click", downloadCsvFile);
     document.getElementById("btn-preview-csv").addEventListener("click", openCsvPreviewModal);
     document.getElementById("btn-download-csv-modal").addEventListener("click", downloadCsvFile);
@@ -2033,6 +2292,17 @@
       const csv = buildCsvContent(state.records).replace(/^\uFEFF/, "");
       navigator.clipboard?.writeText(csv);
       showToast("Datos CSV copiados al portapapeles");
+    });
+
+    window.addEventListener("online", () => {
+      updateClockAndBadges();
+      showToast("Conexión restablecida. Sincronizando registros...");
+      syncPendingLocalRecords();
+    });
+
+    window.addEventListener("offline", () => {
+      updateClockAndBadges();
+      showToast("Sin conexión a la red: activado modo offline del equipo.");
     });
 
     if ("serviceWorker" in navigator) {
